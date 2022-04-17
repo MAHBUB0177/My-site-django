@@ -1,0 +1,173 @@
+{% extends "news/base_js.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+    <!-- grid column -->
+    <div class="col-lg-12">
+        <!-- .card -->
+        <div class="card card-fluid">
+            <!-- .card-body -->
+            <div class="card-body">
+                <div>
+                    <!--form method="post" novalidate-->
+                    <form method="post" id="tran_table_data" data-url="{% url 'student-info-create-insert' %}"
+                        class="update-form">
+                        <div class="form-group">
+                            <!-- .card -->
+                            <div class="card">
+                                <!-- .card-body -->
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="form-item col-md-10 mb-0">
+                                            <h3 class="card-title">student info</h3>
+                                            <!-- form .needs-validation -->
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <!--form method="post" novalidate-->
+                                        {% csrf_token %}
+                                        <div class="form-row">
+                                            <div class="form-item col-md-4 mb-0">
+                                                {{ form.stu_name|as_crispy_field }}
+                                            </div>
+                                            <div class="form-item col-md-4 mb-0">
+                                                {{ form.stu_roll|as_crispy_field }}
+                                            </div>
+                                            <div class="form-item col-md-4 mb-0">
+                                                {{ form.stu_phn|as_crispy_field }}
+                                            </div>
+
+                                            <div class="form-item col-md-4 mb-0">
+                                                {{ form.stu_address|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                        <button type="button" id="btnAddItem" class="btn btn-primary">Create
+                                            student-info</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div><!-- /.card-body -->
+            </div><!-- /.card -->
+        </div>
+        <!-- /grid column -->
+    </div>
+
+    {% endblock content %}
+
+    {% block js %}
+
+    <script>
+
+        $(function () {
+
+            $("#id_stu_roll").on("change paste keyup", function () {
+                get_student_info();
+            });
+
+            function get_student_info() {
+                var stu_roll = document.getElementById('id_stu_roll').value;
+                $.ajax({
+                    url: "get-student-info/" + stu_roll,
+                    type: 'GET',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            console.log(data.stu_name)
+                            $('#id_stu_name').val(data.stu_name);
+                            $('#id_stu_phn').val(data.stu_phn);
+                            $('#id_stu_address').val(data.stu_address);
+                        } else {
+                            $('#id_stu_name').val('');
+                            $('#id_stu_phn').val('');
+                            $('#id_stu_address').val('');
+                        }
+                    }
+                })
+                return false;
+            }
+
+            $("#id_total_quantity").on("change paste keyup", function () {
+                var total_quantity = document.getElementById('id_total_quantity').value;
+                var unit_price = document.getElementById('id_unit_price').value;
+                var total_price = Number(unit_price) * Number(total_quantity);
+                console.log(total_price);
+                $('#id_total_price').val(total_price);
+            });
+
+            $(function () {
+                $('#btnAddItem').click(function () {
+                    post_tran_table_data();
+
+                });
+            });
+
+            function post_tran_table_data() {
+                var data_string = $("#tran_table_data").serialize();
+                var data_url = $("#tran_table_data").attr('data-url');
+                $.ajax({
+                    url: data_url,
+                    data: data_string,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            document.getElementById("tran_table_data").reset();
+                            alert(data.succ_message);
+                        } else {
+                            alert(data.error_message);
+                        }
+                    }
+                })
+                return false;
+            }
+
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            var csrftoken = getCookie('csrftoken');
+
+
+            function csrfSafeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            function sameOrigin(url) {
+
+                var host = document.location.host; // host + port
+                var protocol = document.location.protocol;
+                var sr_origin = '//' + host;
+                var origin = protocol + sr_origin;
+                return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                    (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                    !(/^(\/\/|http:|https:).*/.test(url));
+            }
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+        });
+
+    </script>
+
+
+    {% endblock js %}

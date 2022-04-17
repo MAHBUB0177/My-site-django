@@ -1,0 +1,53 @@
+{% extends "news/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form  method="post" autocomplete="off">
+    {% csrf_token %}
+    
+
+    {{form.account_number|as_crispy_field}}
+    {{form.client_name|as_crispy_field}}
+    
+    <div class="row">
+        <div class="col-md-4">
+            {{form.client_address|as_crispy_field}}
+        </div>
+        <div class="col-md-8">
+        
+            {{form.client_nid|as_crispy_field}}
+        </div>
+                <div class="col-md-4">
+        
+            {{form.date_of_birth|as_crispy_field}}
+        </div>
+
+          <div class="col-md-4">
+        
+            {{form.totoal_deposit|as_crispy_field}}
+        </div>
+
+          <div class="col-md-4">
+        
+            {{form.total_withdwral|as_crispy_field}}
+        </div>
+
+          <div class="col-md-4">
+        
+            {{form.account_balance|as_crispy_field}}
+        </div>
+       
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <button type="submit" class="btn btn-success btn-block btn-lg"><i class="fas fa-database"></i>
+                Submit</button>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'client_list' %}" class="btn btn-secondary btn-block btn-lg">
+                <i class="fas fa-stream"></i> Back to list
+            </a>
+        </div>
+    </div>
+</form>
+{% endblock content %}
